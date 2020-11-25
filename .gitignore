@@ -1,0 +1,7 @@
+venv
+autoenv
+.vscode
+\_\_pycache\_\_
+*.webm
+*.mp4
+*.json
