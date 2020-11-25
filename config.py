@@ -18,20 +18,6 @@ class Config(object):
     BASE_URL_WITH_PORT = "http://asmi.co"
     
     ALLOWED_VIDEO_EXTENSIONS = set(['mp4', 'mkv'])
-    
-    SESSION_COOKIE_SECURE = True
-
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    
-    #SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DEV_SQLALCHEMY_DATABASE_URI')
-    
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-    DB_NAME = os.getenv('DEV_DB_NAME')
-    DB_USERNAME = os.getenv('DEV_DB_USERNAME')
-    DB_PASSWORD = os.getenv('DEV_DB_PASSWORD')
-
-    SESSION_COOKIE_SECURE = False
