@@ -1,6 +1,4 @@
 from flask import Flask
-from datetime import timedelta
-
 import os
 from dotenv import load_dotenv
 
@@ -14,6 +12,9 @@ load_dotenv(dotenv_path)
 app.config["APP"] = os.getenv('FLASK_APP')
 app.config["ENV"] = os.getenv('FLASK_ENV')
 
+# to reject file uploads greater than 16 mb
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
 #Loading which configuration to use
 if app.config["ENV"]=="development":
     app.config.from_object("config.DevelopmentConfig")
@@ -24,5 +25,5 @@ else:
 
 print("The environment is : "+app.config["ENV"])
 
-#Loading views
+#Loading apis
 from app import json_api

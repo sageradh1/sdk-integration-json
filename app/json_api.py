@@ -42,6 +42,8 @@ def isVideoNameAllowed(filename):
     else:
         return False
 
+def getFileSize(filePath):
+    return os.stat(filePath).st_size
 
 def isVideoFilesizeAllowed(videosize):
     if int(videosize) <= app.config["MAX_VIDEO_FILESIZE"]:
@@ -55,57 +57,82 @@ def analyse_video():
     try:       
         if request.method == 'POST':
 
+            if not request.form.get("API_KEY")=="4tert234htkj45b6j45h":
+                message ="Invalid api key"
+                print(message)
+                return jsonify(
+                    status="Error",
+                    message=message
+                    ),403   
+
             _videoUploadStartingTime=datetime.utcnow()
             startingdt_string = _videoUploadStartingTime.strftime("%Y%m%d%H%M%S")
 
             if not request.files:
                 message ="No files received "
                 print(message)
-                return 'bad request!', 400
+                return jsonify(
+                    status="Error",
+                    message=message
+                    ), 400
 
             if ('video' not in request.files):    
-                message ="Missing files "
+                message ="File with key name video is missing"
                 print(message)
-                return 'bad request!', 400
+                return jsonify(
+                    status="Error",
+                    message=message
+                    ), 400
+
 
             video = request.files['video']
 
             if not isVideoNameAllowed(secure_filename(video.filename)):
                 message="Please make sure video file is in valid format.There must be only one dot in the filename"
                 print(message)
-                return 'bad request!', 400
-                      
-            if not isvideosizeAllowed():
-                message="Videosize exceeded maximum limit"
-                print(message)
-                return 'bad request!', 400
+                return jsonify(
+                    status="Error",
+                    message=message
+                    ), 400
 
-            _videostorageLocation = app.config["VIDEO_UPLOADS_FOLDER"]
-            _videoname= video.filename
+            _newVideoName= startingdt_string+video.filename
+            _newBaseName=startingdt_string+_newVideoName.split('.')[0]
+            _extension=_newVideoName.split('.')[1]
 
-            #Revived
-            _basename=startingdt_string+_videoname.split('.')[0]
-            _extension=_videoname.split('.')[1]
-
+            _videoPath=os.path.join(app.config["VIDEO_UPLOADS_FOLDER"], _newVideoName)
             print("Video Saving Started ....")
-            video.save(os.path.join(app.config["VIDEO_UPLOADS_FOLDER"], startingdt_string+video.filename))
-            # csvfile.save(os.path.join(app.config["CSV_UPLOADS_FOLDER"], csvfile.filename))
+            video.save(_videoPath)
             print("Video Saving Completed ....")
 
             ###################### Video is saved till now ###########################
-            
+
+            if not isVideoFilesizeAllowed(getFileSize(_videoPath)):
+                message="Videosize exceeded maximum limit"
+                print(message)
+                return jsonify(
+                    status="Error",
+                    message=message
+                    ), 400
+
             _videoUploadCompletedTime=datetime.utcnow()
 
            
          
             generatedVideoStartingTime=datetime.utcnow()
             gen_video_dt_string = generatedVideoStartingTime.strftime("%Y%m%d%H%M%S")
-            generatedvideoname = gen_video_dt_string+"_generated_"+_videoname.split('.')[0]
+            generatedvideoname = gen_video_dt_string+"_generated_"+_newVideoName.split('.')[0]
 
         message = "Successfully uploaded...."
         print(message)
-        return {status:"Success",message:message, json:"generated"},200
+        return jsonify(
+            status="Success",
+            message=message
+            ), 200
+
     except Exception as err:
         message = "Problem while uploading....Please upload next video..."
         print(message)
-        return {status:"Error",message:err }, 401
+        return jsonify(
+            status="Error",
+            message=str(err)
+            ), 401
