@@ -13,9 +13,7 @@ class Config(object):
     VIDEOANALYTICS_GENERATED_FOLDER =  basedir+"/app/static/analyticsFolder/generated"
     THUMBNAIL_FOR_UPLOADED_VIDEO_FOLDER = basedir+"/app/static/img/generated/thumbnails"
     
-    MAX_VIDEO_FILESIZE = 100 * 1024 * 1024 #max allowed video filesize is 16MB
-    
-    BASE_URL_WITH_PORT = "http://asmi.co"
+    MAX_VIDEO_FILESIZE = 16 * 1024 * 1024 #max allowed video filesize is 16MB
     
     ALLOWED_VIDEO_EXTENSIONS = set(['mp4', 'mkv'])
 
