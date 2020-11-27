@@ -19,3 +19,14 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEBUG = True
+
+    # TODO SHOULD BE PASSED FROM ENV VARIRABLE LATER
+    # SQLALCHEMY_DATABASE_URI = os.getenv('DEV_SQLALCHEMY_DATABASE_URI')
+    # DB_NAME = os.getenv('DEV_DB_NAME')
+    # DB_USERNAME = os.getenv('DEV_DB_USERNAME')
+    # DB_PASSWORD = os.getenv('DEV_DB_PASSWORD')
+    
+    SQLALCHEMY_DATABASE_URI = "postgresql://sdkgroup:sdkpassword123@localhost/sdk_db"
+    
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+

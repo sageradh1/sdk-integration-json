@@ -5,3 +5,4 @@ autoenv
 *.webm
 *.mp4
 *.json
+migrations

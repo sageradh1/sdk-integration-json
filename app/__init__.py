@@ -1,6 +1,8 @@
 from flask import Flask
 import os
 from dotenv import load_dotenv
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 
@@ -24,6 +26,13 @@ else:
     app.config.from_object("config.ProductionConfig")
 
 print("The environment is : "+app.config["ENV"])
+
+#DB config
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+#Loading databaase models
+from app.database import models
 
 #Loading apis
 from app import json_api
