@@ -180,3 +180,11 @@ def get_generated_video():
             status="Error",
             message=message
             ),500
+
+
+@app.route('/health-check', methods=["GET"])
+def health_check():
+    return jsonify(
+        status="Success",
+        message="The api is active."
+        ),200
