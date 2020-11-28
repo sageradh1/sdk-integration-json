@@ -41,7 +41,7 @@ class TestingConfig(Config):
     DEBUG = True
 
     API_KEY=os.getenv('TEST_API_KEY')
-    API_BASE_URL = "todo"
+    API_BASE_URL = "http://52.42.206.246:5001"
     DB_NAME = os.getenv('TEST_DB_NAME')
     DB_USERNAME = os.getenv('TEST_DB_USERNAME')
     DB_PASSWORD = os.getenv('TEST_DB_PASSWORD')
