@@ -89,7 +89,7 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
 
             out.write(frame)
             frame = cv2.resize(frame, None, fx=0.5, fy = 0.5)
-            cv2.imshow('frame', frame)
+            # cv2.imshow('frame', frame)
             print(f"Frame {framenum}: Done!")
             framenum += 1
 
@@ -139,7 +139,7 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
         frame = cv2.resize(frame, None, fx=0.5, fy = 0.5)
         
         # Showing the final frame 
-        cv2.imshow('frame', frame)
+        # cv2.imshow('frame', frame)
         print(f"Frame {framenum}: Done!")
         framenum += 1
 
@@ -158,6 +158,14 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
     # Generating the final data for JSON
     if posterFlag:
         finalData = {
+
+            "dataForVideo":
+                {
+                    "endPoint": f"{app.config['API_BASE_URL']}/{app.config['VIDEO_POSTER_INJECTION_GENERATED_RELATIVEPATH_FOLDER']}/{withAudioOutputFileName}",
+                    "videoResolutionX": fr_w,
+                    "videoResolutionY": fr_h
+                },
+
             "posterForVideo": [
             {
                 "posterFlag": posterFlag,

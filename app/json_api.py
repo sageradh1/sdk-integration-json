@@ -72,7 +72,6 @@ def analyse_video():
             ###################### Validation complete Video will be processed now ###########################
             
             jsonFileName,withAudioOutputFileName = extractVideoPosterInjectionData(_newBaseName,_extension,_newVideoName,_videoPath)
-            print()
             generatedVideoTime=datetime.utcnow()
             gen_video_dt_string = generatedVideoTime.strftime("%Y%m%d%H%M%S")
             generatedvideoname = gen_video_dt_string+"_generated_"+_newVideoName.split('.')[0]

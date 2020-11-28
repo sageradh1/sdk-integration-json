@@ -30,7 +30,7 @@ class DevelopmentConfig(Config):
     DB_NAME = os.getenv('DEV_DB_NAME')
     DB_USERNAME = os.getenv('DEV_DB_USERNAME')
     DB_PASSWORD = os.getenv('DEV_DB_PASSWORD')
-    SQLALCHEMY_DATABASE_URI = f"postgresql://{os.getenv('DEV_DB_USERNAME')}:{os.getenv('DEV_DB_PASSWORD')}@localhost/{os.getenv('DEV_DB_NAME')}"
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{os.getenv('DEV_DB_USERNAME')}:{os.getenv('DEV_DB_PASSWORD')}@{os.getenv('DEV_DB_HOST')}/{os.getenv('DEV_DB_NAME')}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class TestConfig(Config):
