@@ -2,6 +2,12 @@ import secrets
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+from dotenv import load_dotenv
+
+#Loading environment from .startingenv
+APP_ROOT = os.path.join(os.path.dirname(__file__), '..')   # refers to application_top
+dotenv_path = os.path.join(APP_ROOT, '.env')
+load_dotenv(dotenv_path)
 
 class Config(object):
     DEBUG = False
@@ -35,7 +41,7 @@ class TestConfig(Config):
     DB_NAME = os.getenv('TEST_DB_NAME')
     DB_USERNAME = os.getenv('TEST_DB_USERNAME')
     DB_PASSWORD = os.getenv('TEST_DB_PASSWORD')
-    # SQLALCHEMY_DATABASE_URI = f"postgresql://{os.getenv('TEST_DB_USERNAME')}:{os.getenv('TEST_DB_PASSWORD')}@someip/{os.getenv('TEST_DB_NAME')}"
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{os.getenv('TEST_DB_USERNAME')}:{os.getenv('TEST_DB_PASSWORD')}@{os.getenv('TEST_DB_HOST')}/{os.getenv('TEST_DB_NAME')}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

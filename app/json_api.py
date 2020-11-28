@@ -99,7 +99,7 @@ def analyse_video():
             ), 400
 
 @app.route('/get-json', methods=["POST"])
-def analyse_video():
+def get_json():
     try:       
         if request.method == 'POST':
             ########################## Validation ###########################
@@ -119,18 +119,18 @@ def analyse_video():
                     message=message
                     ),400
 
-  
+        message="Successfully fetched"
         print(message)
         return jsonify(
             status="Success",
             message=message,
-            jsonFileUrl=f"localhost/static/{_uploadedVideo.analyticsFileName}"
+            jsonFileUrl=f"localhost/static/qewq"
             ), 200
 
-#     except Exception as err:
-#         message = "Problem while uploading....Please try with next video..."
-#         print(err)
-#         return jsonify(
-#             status="Error",
-#             message=message
-#             ), 400
+    except Exception as err:
+        message = "Problem while fetching json."
+        print(err)
+        return jsonify(
+            status="Error",
+            message=message
+            ),500
