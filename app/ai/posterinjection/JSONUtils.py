@@ -59,7 +59,7 @@ def get_reference_point(cap, poster, fps, out, fr_w, fr_h):
 		if (not faces) and switch:
 			out.write(frame)
 			frame = cv2.resize(frame, None, fx = 0.5, fy = 0.5)
-			cv2.imshow('frame', frame)
+			# cv2.imshow('frame', frame)
 			print(f"Frame {framenum}: No Face Detected!")
 			framenum += 1
 
