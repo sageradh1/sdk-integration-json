@@ -18,7 +18,7 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-
+    API_KEY=os.getenv('DEV_API_KEY')
     API_BASE_URL = "http://127.0.0.1:5000"
     DB_NAME = os.getenv('DEV_DB_NAME')
     DB_USERNAME = os.getenv('DEV_DB_USERNAME')
@@ -30,6 +30,7 @@ class TestConfig(Config):
     # TODO
     DEBUG = True
 
+    API_KEY=os.getenv('TEST_API_KEY')
     # API_BASE_URL = ""
     DB_NAME = os.getenv('TEST_DB_NAME')
     DB_USERNAME = os.getenv('TEST_DB_USERNAME')
