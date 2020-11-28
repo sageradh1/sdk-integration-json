@@ -158,6 +158,7 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
 
     # Generating the final data for JSON
     if posterFlag:
+        isPosterInjected=True
         finalData = {
 
             "dataForVideo":
@@ -184,6 +185,7 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
             ]
         }
     else:
+        isPosterInjected=False
         finalData = {
             "dataForVideo":
                 {

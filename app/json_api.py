@@ -76,7 +76,11 @@ def analyse_video():
             gen_video_dt_string = generatedVideoTime.strftime("%Y%m%d%H%M%S")
             generatedvideoname = gen_video_dt_string+"_generated_"+_newVideoName.split('.')[0]
 
-            _uploadedVideo = UploadedVideo(filename = withAudioOutputFileName,uploadStartedTime = _videoUploadTime,uploadCompletedTime=generatedVideoTime,analyticsFileName=jsonFileName,generatedVideoFileName=withAudioOutputFileName,isPosterInjected=isPosterInjected)
+            if isPosterInjected:
+                _uploadedVideo = UploadedVideo(filename = _newVideoName,uploadStartedTime = _videoUploadTime,uploadCompletedTime=generatedVideoTime,analyticsFileName=jsonFileName,generatedVideoFileName=withAudioOutputFileName,isPosterInjected=isPosterInjected)
+            else:
+                _uploadedVideo = UploadedVideo(filename = _newVideoName,uploadStartedTime = _videoUploadTime,uploadCompletedTime=generatedVideoTime,analyticsFileName=jsonFileName,generatedVideoFileName=_newVideoName,isPosterInjected=isPosterInjected)
+
             db.session.add(_uploadedVideo)
             db.session.commit()
 
@@ -177,7 +181,7 @@ def get_generated_video():
                 ),200
 
     except Exception as err:
-        message = "Problem while fetching json."
+        message = "Problem while fetching video."
         print(err)
         app.logger.error(err,exc_info=True)
         return jsonify(
