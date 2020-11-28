@@ -19,8 +19,11 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
     fr_w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     fr_h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
+    tempNoAudioFileName=f"{__newBaseName}_no_Audio.mp4"
+    withAudioOutputFileName=f"injected_{__newBaseName}.mp4"
+    jsonFileName=f"{__newBaseName}.json"
     # object to writing the output video
-    out = cv2.VideoWriter(outputVideoPath + f"/{__newBaseName}_no_Audio.mp4", cv2.VideoWriter_fourcc(*"mp4v"), fps, (fr_w, fr_h))
+    out = cv2.VideoWriter(outputVideoPath + f"/{tempNoAudioFileName}", cv2.VideoWriter_fourcc(*"mp4v"), fps, (fr_w, fr_h))
 
     # Getting the reference point from the function in utils
     reference_point, left, right, top, bottom, framenum, fr_w, fr_h= get_reference_point(cap, poster, fps, out, fr_w, fr_h)
@@ -190,15 +193,17 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
             ]
         }
 
-    with open(f"{app.config['VIDEOANALYTICS_POSTER_INJECTION_GENERATED_FOLDER']}/{__newBaseName}.json", "w") as f:
+    with open(f"{app.config['VIDEOANALYTICS_POSTER_INJECTION_GENERATED_FOLDER']}/{jsonFileName}", "w") as f:
         json.dump(finalData, f, indent=3)
 
     # Generating final video with audio // Make sure you run the whole video
     videoWithAudio = mpe.VideoFileClip(_videoPath)
-    posterVideoWithoutAudio = mpe.VideoFileClip(outputVideoPath + f"/{__newBaseName}_no_Audio.mp4")
+    posterVideoWithoutAudio = mpe.VideoFileClip(outputVideoPath + f"/{tempNoAudioFileName}")
     audio_bg = videoWithAudio.audio
     posterVideoWithAudio = posterVideoWithoutAudio.set_audio(audio_bg)
-    posterVideoWithAudio.write_videofile(outputVideoPath + f"/injected_{__newBaseName}.mp4")
+    posterVideoWithAudio.write_videofile(outputVideoPath + f"/{withAudioOutputFileName}")
 
-    if os.path.isfile(outputVideoPath + f"/{__newBaseName}_no_Audio.mp4"):
-        os.remove(outputVideoPath + f"/{__newBaseName}_no_Audio.mp4")
+    if os.path.isfile(outputVideoPath + f"/{tempNoAudioFileName}"):
+        os.remove(outputVideoPath + f"/{tempNoAudioFileName}")
+    
+    return jsonFileName,withAudioOutputFileName

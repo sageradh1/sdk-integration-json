@@ -19,13 +19,22 @@ class Config(object):
 class DevelopmentConfig(Config):
     DEBUG = True
 
-    # TODO SHOULD BE PASSED FROM ENV VARIRABLE LATER
-    # SQLALCHEMY_DATABASE_URI = os.getenv('DEV_SQLALCHEMY_DATABASE_URI')
-    # DB_NAME = os.getenv('DEV_DB_NAME')
-    # DB_USERNAME = os.getenv('DEV_DB_USERNAME')
-    # DB_PASSWORD = os.getenv('DEV_DB_PASSWORD')
-    
-    SQLALCHEMY_DATABASE_URI = "postgresql://sdkgroup:sdkpassword123@localhost/sdk_db"
-    
+    API_BASE_URL = "http://127.0.0.1:5000"
+    DB_NAME = os.getenv('DEV_DB_NAME')
+    DB_USERNAME = os.getenv('DEV_DB_USERNAME')
+    DB_PASSWORD = os.getenv('DEV_DB_PASSWORD')
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{os.getenv('DEV_DB_USERNAME')}:{os.getenv('DEV_DB_PASSWORD')}@localhost/{os.getenv('DEV_DB_NAME')}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+class TestConfig(Config):
+    # TODO
+    DEBUG = True
+
+    # API_BASE_URL = ""
+    DB_NAME = os.getenv('TEST_DB_NAME')
+    DB_USERNAME = os.getenv('TEST_DB_USERNAME')
+    DB_PASSWORD = os.getenv('TEST_DB_PASSWORD')
+    # SQLALCHEMY_DATABASE_URI = f"postgresql://{os.getenv('TEST_DB_USERNAME')}:{os.getenv('TEST_DB_PASSWORD')}@someip/{os.getenv('TEST_DB_NAME')}"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 

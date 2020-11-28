@@ -1,4 +1,5 @@
-from app import app
+from app import app,db
+from app.database.models import UploadedVideo
 from flask import request,jsonify,make_response,redirect, render_template
 import os
 import urllib.request
@@ -20,8 +21,8 @@ def analyse_video():
                     message=message
                     ),403
 
-            _videoUploadStartingTime=datetime.utcnow()
-            startingdt_string = _videoUploadStartingTime.strftime("%Y%m%d%H%M%S")
+            _videoUploadTime=datetime.utcnow()
+            startingdt_string = _videoUploadTime.strftime("%Y%m%d%H%M%S")
 
             if not request.files:
                 message ="No files received "
@@ -71,40 +72,65 @@ def analyse_video():
 
             ###################### Validation complete Video will be processed now ###########################
             
-            extracted_json = extractVideoPosterInjectionData(_newBaseName,_extension,_newVideoName,_videoPath)
+            jsonFileName,withAudioOutputFileName = extractVideoPosterInjectionData(_newBaseName,_extension,_newVideoName,_videoPath)
+            print()
+            generatedVideoTime=datetime.utcnow()
+            gen_video_dt_string = generatedVideoTime.strftime("%Y%m%d%H%M%S")
+            generatedvideoname = gen_video_dt_string+"_generated_"+_newVideoName.split('.')[0]
 
-            _videoUploadCompletedTime=datetime.utcnow()
-
- 
-  
-    # filename = db.Column(db.String(400), unique=True)
-
-    # uploadStartedTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    # uploadCompletedTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)    
-
-    # analyticsFileName =  db.Column(db.String(600), unique=True)
-    # generatedVideoFileName =  db.Column(db.String(600), unique=True)
-
-
-    #         generatedVideoStartingTime=datetime.utcnow()
-    #         gen_video_dt_string = generatedVideoStartingTime.strftime("%Y%m%d%H%M%S")
-    #         generatedvideoname = gen_video_dt_string+"_generated_"+_newVideoName.split('.')[0]
-
-    #         _uploadedVideo = UploadedVideo(filename = generatedVideoFilename,storagelocation = app.config['VIDEO_GENERATED_FOLDER'],createdTime = generatedVideoStartingTime,video_id = _uploadedVideo.videoid)
-    #         db.session.add(generatedVideo)
-    #         db.session.commit()
+            _uploadedVideo = UploadedVideo(filename = withAudioOutputFileName,uploadStartedTime = _videoUploadTime,uploadCompletedTime=generatedVideoTime,analyticsFileName=jsonFileName,generatedVideoFileName=withAudioOutputFileName)
+            db.session.add(_uploadedVideo)
+            db.session.commit()
 
         message = "Successfully uploaded...."
         print(message)
         return jsonify(
             status="Success",
-            message=message
+            message=message,
+            jsonFileUrl=f"localhost/static/{_uploadedVideo.analyticsFileName}"
             ), 200
 
     except Exception as err:
         message = "Problem while uploading....Please try with next video..."
-        print(message)
+        print(err)
         return jsonify(
             status="Error",
-            message=str(err)
+            message=message
+            ), 400
+
+@app.route('/get-json', methods=["POST"])
+def analyse_video():
+    try:       
+        if request.method == 'POST':
+            ########################## Validation ###########################
+            if not request.form.get("API_KEY")=="4tert234htkj45b6j45h":
+                message ="Invalid api key"
+                print(message)
+                return jsonify(
+                    status="Error",
+                    message=message
+                    ),403
+
+            if not request.form.get("videoId"):
+                message ="Please provide proper videoid"
+                print(message)
+                return jsonify(
+                    status="Error",
+                    message=message
+                    ),400
+
+  
+        print(message)
+        return jsonify(
+            status="Success",
+            message=message,
+            jsonFileUrl=f"localhost/static/{_uploadedVideo.analyticsFileName}"
+            ), 200
+
+    except Exception as err:
+        message = "Problem while uploading....Please try with next video..."
+        print(err)
+        return jsonify(
+            status="Error",
+            message=message
             ), 400
