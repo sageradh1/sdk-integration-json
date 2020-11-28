@@ -4,66 +4,21 @@ import os
 import urllib.request
 from werkzeug.utils import secure_filename
 from datetime import datetime
-
-
-def isVideoNameAllowedWithExtension(filename):
-    # We only want files with a . in the filename
-    if not "." in filename:
-        return False
-    counter = filename.count('.')
-
-    if counter == 1: 
-        # Split the extension from the filename
-        ext = filename.rsplit(".", 1)[1]
-        # Check if the extension is in ALLOWED_VIDEO_EXTENSIONS
-    else:
-        temp = filename.split(".")
-        ext = temp[counter]
-
-    if ext.lower() in app.config["ALLOWED_VIDEO_EXTENSIONS"]:
-        return True,ext
-    else:
-        return False,ext
-
-def isVideoNameAllowed(filename):
-    # We only want files with a . in the filename
-    if not "." in filename:
-        return False
-
-    counter = filename.count('.')
-    # Split the extension from the filename
-    ext = filename.rsplit(".", 1)[1]
-
-    if counter == 1: 
-        if ext.lower() in app.config["ALLOWED_VIDEO_EXTENSIONS"]:
-            return True
-        else:
-            return False
-    else:
-        return False
-
-def getFileSize(filePath):
-    return os.stat(filePath).st_size
-
-def isVideoFilesizeAllowed(videosize):
-    if int(videosize) <= app.config["MAX_VIDEO_FILESIZE"]:
-        return True
-    else:
-        return False
-
+from .ai.posterinjection.video_parser import extractVideoPosterInjectionData
+from .utils.file_validation import *
 
 @app.route('/analyse-video', methods=["POST"])
 def analyse_video():
     try:       
         if request.method == 'POST':
-
+            ########################## Validation ###########################
             if not request.form.get("API_KEY")=="4tert234htkj45b6j45h":
                 message ="Invalid api key"
                 print(message)
                 return jsonify(
                     status="Error",
                     message=message
-                    ),403   
+                    ),403
 
             _videoUploadStartingTime=datetime.utcnow()
             startingdt_string = _videoUploadStartingTime.strftime("%Y%m%d%H%M%S")
@@ -99,10 +54,10 @@ def analyse_video():
             _newBaseName=startingdt_string+_newVideoName.split('.')[0]
             _extension=_newVideoName.split('.')[1]
 
-            _videoPath=os.path.join(app.config["VIDEO_UPLOADS_FOLDER"], _newVideoName)
-            print("Video Saving Started ....")
+            _videoPath=os.path.join(app.config["VIDEO_POSTER_INJECTION_UPLOADS_FOLDER"], _newVideoName)
+            print(f"Video {_newVideoName} Saving Started ....")
             video.save(_videoPath)
-            print("Video Saving Completed ....")
+            print(f"Video {_newVideoName} Saving Completed ....")
 
             ###################### Video is saved till now ###########################
 
@@ -113,6 +68,10 @@ def analyse_video():
                     status="Error",
                     message=message
                     ), 400
+
+            ###################### Validation complete Video will be processed now ###########################
+            
+            extracted_json = extractVideoPosterInjectionData(_newBaseName,_extension,_newVideoName,_videoPath)
 
             _videoUploadCompletedTime=datetime.utcnow()
 
@@ -130,9 +89,9 @@ def analyse_video():
             ), 200
 
     except Exception as err:
-        message = "Problem while uploading....Please upload next video..."
+        message = "Problem while uploading....Please try with next video..."
         print(message)
         return jsonify(
             status="Error",
             message=str(err)
-            ), 401
+            ), 400

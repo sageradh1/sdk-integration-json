@@ -6,12 +6,11 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
     DEBUG = False
     TESTING = False
-        
-    ADIMAGE_UPLOADS_FOLDER = basedir+ "/app/static/img/ad-images"
-    VIDEO_UPLOADS_FOLDER =  basedir+"/app/static/video/uploaded"
-    VIDEO_GENERATED_FOLDER =  basedir+"/app/static/video/generated"
-    VIDEOANALYTICS_GENERATED_FOLDER =  basedir+"/app/static/analyticsFolder/generated"
-    THUMBNAIL_FOR_UPLOADED_VIDEO_FOLDER = basedir+"/app/static/img/generated/thumbnails"
+
+    ADIMAGE_POSTER_INJECTION_UPLOADS_FOLDER = basedir+ "/app/static/image/posterinjection/ad-images"
+    VIDEO_POSTER_INJECTION_UPLOADS_FOLDER =  basedir+"/app/static/video/posterinjection/uploaded"
+    VIDEO_POSTER_INJECTION_GENERATED_FOLDER =  basedir+"/app/static/video/posterinjection/generated"
+    VIDEOANALYTICS_POSTER_INJECTION_GENERATED_FOLDER =  basedir+"/app/static/analyticsFolder/posterinjection/generated"
     
     MAX_VIDEO_FILESIZE = 16 * 1024 * 1024 #max allowed video filesize is 16MB
     
