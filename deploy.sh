@@ -1,0 +1,1 @@
+scp -i ~/.ssh/asmi-key.pem -r $(pwd) ubuntu@52.42.206.246:json_api
