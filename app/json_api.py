@@ -87,7 +87,7 @@ def analyse_video():
         return jsonify(
             status="Success",
             message=message,
-            jsonFileUrl=f"localhost/static/{_uploadedVideo.analyticsFileName}"
+            videoId=_uploadedVideo.videoid
             ), 200
 
     except Exception as err:
@@ -98,39 +98,39 @@ def analyse_video():
             message=message
             ), 400
 
-@app.route('/get-json', methods=["POST"])
-def analyse_video():
-    try:       
-        if request.method == 'POST':
-            ########################## Validation ###########################
-            if not request.form.get("API_KEY")=="4tert234htkj45b6j45h":
-                message ="Invalid api key"
-                print(message)
-                return jsonify(
-                    status="Error",
-                    message=message
-                    ),403
+# @app.route('/get-json', methods=["POST"])
+# def analyse_video():
+#     try:       
+#         if request.method == 'POST':
+#             ########################## Validation ###########################
+#             if not request.form.get("API_KEY")=="4tert234htkj45b6j45h":
+#                 message ="Invalid api key"
+#                 print(message)
+#                 return jsonify(
+#                     status="Error",
+#                     message=message
+#                     ),403
 
-            if not request.form.get("videoId"):
-                message ="Please provide proper videoid"
-                print(message)
-                return jsonify(
-                    status="Error",
-                    message=message
-                    ),400
+#             if not request.form.get("videoId"):
+#                 message ="Please provide proper videoid"
+#                 print(message)
+#                 return jsonify(
+#                     status="Error",
+#                     message=message
+#                     ),400
 
   
-        print(message)
-        return jsonify(
-            status="Success",
-            message=message,
-            jsonFileUrl=f"localhost/static/{_uploadedVideo.analyticsFileName}"
-            ), 200
+#         print(message)
+#         return jsonify(
+#             status="Success",
+#             message=message,
+#             jsonFileUrl=f"localhost/static/{_uploadedVideo.analyticsFileName}"
+#             ), 200
 
-    except Exception as err:
-        message = "Problem while uploading....Please try with next video..."
-        print(err)
-        return jsonify(
-            status="Error",
-            message=message
-            ), 400
+#     except Exception as err:
+#         message = "Problem while uploading....Please try with next video..."
+#         print(err)
+#         return jsonify(
+#             status="Error",
+#             message=message
+#             ), 400
