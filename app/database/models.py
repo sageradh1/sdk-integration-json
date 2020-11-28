@@ -1,6 +1,7 @@
 from app import db
 from datetime import datetime
 
+
 class UploadedVideo(db.Model):
     videoid = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(400), unique=True)
@@ -8,28 +9,42 @@ class UploadedVideo(db.Model):
     uploadStartedTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     uploadCompletedTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)    
     totalduration = db.Column(db.String())
-    analyticsFile = db.relationship('VideoAnalyticsFile', backref='videoAnalyticsFile', lazy='dynamic')
-    generatedVideoFile = db.relationship('GeneratedVideo', backref='generatedVideo', lazy='dynamic')
+    analyticsFileName =  db.Column(db.String(600), unique=True)
+    generatedVideoFileName =  db.Column(db.String(600), unique=True)
 
     def __repr__(self):
-        return "<UploadedVideo filename:{} uploadCompletedTime:{} >".format(self.filename,self.uploadCompletedTime)
+        return "<UploadedVideo  videoid{} filename:{} analyticsFileName{} generatedVideoFileName{} uploadCompletedTime:{} >".format(self.videoid,self.filename,self.analyticsFileName,self.generatedVideoFileName,self.uploadCompletedTime)
 
-class VideoAnalyticsFile(db.Model):
-    analyticsfileid = db.Column(db.Integer, primary_key=True)
-    filename = db.Column(db.String(400))
-    createdTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    video_id = db.Column(db.Integer, db.ForeignKey('uploaded_video.videoid'))
-    def __repr__(self):
-        return '<VideoAnalyticsFile video_id:{}  filename:{} createdTime:{}  >'.format(self.video_id,self.filename,self.createdTime)
+# Normalise configuration
+# class UploadedVideo(db.Model):
+#     videoid = db.Column(db.Integer, primary_key=True)
+#     filename = db.Column(db.String(400), unique=True)
+#     extension = db.Column(db.String(5))
+#     uploadStartedTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+#     uploadCompletedTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)    
+#     totalduration = db.Column(db.String())
+#     analyticsFile = db.relationship('VideoAnalyticsFile', backref='videoAnalyticsFile', lazy='dynamic')
+#     generatedVideoFile = db.relationship('GeneratedVideo', backref='generatedVideo', lazy='dynamic')
 
-class GeneratedVideo(db.Model):
-    gvideoid = db.Column(db.Integer, primary_key=True)
-    filename = db.Column(db.String(400))
-    createdTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    video_id = db.Column(db.Integer, db.ForeignKey('uploaded_video.videoid'))
+#     def __repr__(self):
+#         return "<UploadedVideo filename:{} uploadCompletedTime:{} >".format(self.filename,self.uploadCompletedTime)
 
-    def __repr__(self):
-        return '<GeneratedVideo gvideoid:{}  filename:{} createdTime:{} video_id >'.format(self.gvideoid,self.filename,self.createdTime.self.video_id)
+# class VideoAnalyticsFile(db.Model):
+#     analyticsfileid = db.Column(db.Integer, primary_key=True)
+#     filename = db.Column(db.String(400))
+#     createdTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+#     video_id = db.Column(db.Integer, db.ForeignKey('uploaded_video.videoid'))
+#     def __repr__(self):
+#         return '<VideoAnalyticsFile video_id:{}  filename:{} createdTime:{}  >'.format(self.video_id,self.filename,self.createdTime)
+
+# class GeneratedVideo(db.Model):
+#     gvideoid = db.Column(db.Integer, primary_key=True)
+#     filename = db.Column(db.String(400))
+#     createdTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+#     video_id = db.Column(db.Integer, db.ForeignKey('uploaded_video.videoid'))
+
+#     def __repr__(self):
+#         return '<GeneratedVideo gvideoid:{}  filename:{} createdTime:{} video_id >'.format(self.gvideoid,self.filename,self.createdTime.self.video_id)
 
 ########################### Merged AdCategory ###################################
 # class MergedAdCategory(db.Model):
