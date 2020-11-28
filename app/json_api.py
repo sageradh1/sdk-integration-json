@@ -1,7 +1,6 @@
 from app import app,db
 from app.database.models import UploadedVideo
-from flask import request,jsonify,make_response,redirect, render_template
-import os
+from flask import request,jsonify,json
 import urllib.request
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -119,13 +118,12 @@ def get_json():
                     message=message
                     ),400
 
+        _uploadedVideo = UploadedVideo.query.filter_by(videoid=request.form.get("videoId")).first()
+
+        filename = _uploadedVideo.analyticsFileName
         message="Successfully fetched"
         print(message)
-        return jsonify(
-            status="Success",
-            message=message,
-            jsonFileUrl=f"localhost/static/qewq"
-            ), 200
+        return json.load(open(f"{app.config['VIDEOANALYTICS_POSTER_INJECTION_GENERATED_FOLDER']}/{filename}"))
 
     except Exception as err:
         message = "Problem while fetching json."
