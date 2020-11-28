@@ -75,11 +75,24 @@ def analyse_video():
 
             _videoUploadCompletedTime=datetime.utcnow()
 
-           
-         
-            generatedVideoStartingTime=datetime.utcnow()
-            gen_video_dt_string = generatedVideoStartingTime.strftime("%Y%m%d%H%M%S")
-            generatedvideoname = gen_video_dt_string+"_generated_"+_newVideoName.split('.')[0]
+ 
+  
+    # filename = db.Column(db.String(400), unique=True)
+
+    # uploadStartedTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    # uploadCompletedTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)    
+
+    # analyticsFileName =  db.Column(db.String(600), unique=True)
+    # generatedVideoFileName =  db.Column(db.String(600), unique=True)
+
+
+    #         generatedVideoStartingTime=datetime.utcnow()
+    #         gen_video_dt_string = generatedVideoStartingTime.strftime("%Y%m%d%H%M%S")
+    #         generatedvideoname = gen_video_dt_string+"_generated_"+_newVideoName.split('.')[0]
+
+    #         _uploadedVideo = UploadedVideo(filename = generatedVideoFilename,storagelocation = app.config['VIDEO_GENERATED_FOLDER'],createdTime = generatedVideoStartingTime,video_id = _uploadedVideo.videoid)
+    #         db.session.add(generatedVideo)
+    #         db.session.commit()
 
         message = "Successfully uploaded...."
         print(message)

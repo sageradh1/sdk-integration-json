@@ -5,17 +5,15 @@ from datetime import datetime
 class UploadedVideo(db.Model):
     videoid = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(400), unique=True)
-    extension = db.Column(db.String(5))
     uploadStartedTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     uploadCompletedTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)    
-    totalduration = db.Column(db.String())
     analyticsFileName =  db.Column(db.String(600), unique=True)
     generatedVideoFileName =  db.Column(db.String(600), unique=True)
 
     def __repr__(self):
         return "<UploadedVideo  videoid{} filename:{} analyticsFileName{} generatedVideoFileName{} uploadCompletedTime:{} >".format(self.videoid,self.filename,self.analyticsFileName,self.generatedVideoFileName,self.uploadCompletedTime)
 
-# Normalise configuration
+#################### Normalised configuration
 # class UploadedVideo(db.Model):
 #     videoid = db.Column(db.Integer, primary_key=True)
 #     filename = db.Column(db.String(400), unique=True)
