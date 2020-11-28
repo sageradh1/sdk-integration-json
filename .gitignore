@@ -6,4 +6,3 @@ autoenv
 *.mp4
 *.json
 migrations
-\.env

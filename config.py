@@ -36,7 +36,7 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = f"postgresql://{os.getenv('DEV_DB_USERNAME')}:{os.getenv('DEV_DB_PASSWORD')}@{os.getenv('DEV_DB_HOST')}/{os.getenv('DEV_DB_NAME')}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-class TestConfig(Config):
+class TestingConfig(Config):
     # TODO
     DEBUG = True
 
