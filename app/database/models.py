@@ -9,6 +9,7 @@ class UploadedVideo(db.Model):
     uploadCompletedTime = db.Column(db.DateTime, index=True, default=datetime.utcnow)    
     analyticsFileName =  db.Column(db.String(600), unique=True)
     generatedVideoFileName =  db.Column(db.String(600), unique=True)
+    isPosterInjected =  db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return "<UploadedVideo  videoid{} filename:{} analyticsFileName{} generatedVideoFileName{} uploadCompletedTime:{} >".format(self.videoid,self.filename,self.analyticsFileName,self.generatedVideoFileName,self.uploadCompletedTime)

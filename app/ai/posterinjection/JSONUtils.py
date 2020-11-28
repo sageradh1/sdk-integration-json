@@ -24,7 +24,9 @@ def checkGijiGiji(checkDil, fr_w, fr_h):
 	return gijiFlag
 
 def get_reference_point(cap, poster, fps, out, fr_w, fr_h):
-
+	isPosterInjection=False
+	reference_point = 0,0
+	left, right, top, bottom, framenum = 0,0,0,0,0
 	# Shape of the poster
 	pos_h, pos_w, _ = poster.shape
 	ratio = pos_h/pos_w
@@ -72,7 +74,7 @@ def get_reference_point(cap, poster, fps, out, fr_w, fr_h):
 		# If there is a face and switch is True, get the top-left and bottom-right coordinates of the face and make switch False
 		# Note: We define the injecting area as per the location of the face
 		if faces and switch:
-
+			isPosterInjection=True
 			# Looping over the faces in the frame
 			for face in faces:
 
@@ -142,7 +144,7 @@ def get_reference_point(cap, poster, fps, out, fr_w, fr_h):
 		else:
 			break
 
-	return reference_point, left, right, top, bottom, framenum, fr_w, fr_h
+	return reference_point, left, right, top, bottom, framenum, fr_w, fr_h,isPosterInjection
 
 #Function to get the upper and lower hsv range of values
 def get_hsv_range(currHSV, firstHSV):

@@ -10,9 +10,10 @@ from app import app
 
 outputVideoPath= app.config['VIDEO_POSTER_INJECTION_GENERATED_FOLDER']
 
-def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_videoPath):
+def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_videoFulllPath):
+    isPosterInjected=False
     poster = cv2.imread(f"{app.config['ADIMAGE_POSTER_INJECTION_UPLOADS_FOLDER']}/easports.jpg")
-    cap = cv2.VideoCapture(_videoPath)
+    cap = cv2.VideoCapture(_videoFulllPath)
 
     # fps, width and height of the current video
     fps = int(cap.get(cv2.CAP_PROP_FPS))
@@ -26,7 +27,7 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
     out = cv2.VideoWriter(outputVideoPath + f"/{tempNoAudioFileName}", cv2.VideoWriter_fourcc(*"mp4v"), fps, (fr_w, fr_h))
 
     # Getting the reference point from the function in utils
-    reference_point, left, right, top, bottom, framenum, fr_w, fr_h= get_reference_point(cap, poster, fps, out, fr_w, fr_h)
+    reference_point, left, right, top, bottom, framenum, fr_w, fr_h,isPosterInjected= get_reference_point(cap, poster, fps, out, fr_w, fr_h)
 
     #Initializing the different switches and Flags
     HSVSwitch = True
@@ -184,6 +185,12 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
         }
     else:
         finalData = {
+            "dataForVideo":
+                {
+                    "endPoint": f"{app.config['API_BASE_URL']}/{app.config['VIDEO_POSTER_INJECTION_UPLOADS_RELATIVEPATH_FOLDER']}/{_newVideoName}",
+                    "videoResolutionX": fr_w,
+                    "videoResolutionY": fr_h
+                },
             "posterForVideo": [
             {
                 "posterFlag": 0,
@@ -205,7 +212,7 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
         json.dump(finalData, f, indent=3)
 
     # Generating final video with audio // Make sure you run the whole video
-    videoWithAudio = mpe.VideoFileClip(_videoPath)
+    videoWithAudio = mpe.VideoFileClip(_videoFulllPath)
     posterVideoWithoutAudio = mpe.VideoFileClip(outputVideoPath + f"/{tempNoAudioFileName}")
     audio_bg = videoWithAudio.audio
     posterVideoWithAudio = posterVideoWithoutAudio.set_audio(audio_bg)
@@ -214,4 +221,4 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
     if os.path.isfile(outputVideoPath + f"/{tempNoAudioFileName}"):
         os.remove(outputVideoPath + f"/{tempNoAudioFileName}")
     
-    return jsonFileName,withAudioOutputFileName
+    return jsonFileName,withAudioOutputFileName,isPosterInjected

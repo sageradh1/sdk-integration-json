@@ -71,12 +71,12 @@ def analyse_video():
 
             ###################### Validation complete Video will be processed now ###########################
             
-            jsonFileName,withAudioOutputFileName = extractVideoPosterInjectionData(_newBaseName,_extension,_newVideoName,_videoPath)
+            jsonFileName,withAudioOutputFileName,isPosterInjected = extractVideoPosterInjectionData(_newBaseName,_extension,_newVideoName,_videoPath)
             generatedVideoTime=datetime.utcnow()
             gen_video_dt_string = generatedVideoTime.strftime("%Y%m%d%H%M%S")
             generatedvideoname = gen_video_dt_string+"_generated_"+_newVideoName.split('.')[0]
 
-            _uploadedVideo = UploadedVideo(filename = withAudioOutputFileName,uploadStartedTime = _videoUploadTime,uploadCompletedTime=generatedVideoTime,analyticsFileName=jsonFileName,generatedVideoFileName=withAudioOutputFileName)
+            _uploadedVideo = UploadedVideo(filename = withAudioOutputFileName,uploadStartedTime = _videoUploadTime,uploadCompletedTime=generatedVideoTime,analyticsFileName=jsonFileName,generatedVideoFileName=withAudioOutputFileName,isPosterInjected=isPosterInjected)
             db.session.add(_uploadedVideo)
             db.session.commit()
 
@@ -158,17 +158,20 @@ def get_generated_video():
         filename = _uploadedVideo.generatedVideoFileName
         message="Successfully fetched"
         print(message)
-        # print(f"{app.config['VIDEO_POSTER_INJECTION_GENERATED_FOLDER']}/{filename}")
-        # return Response(f"{app.config['VIDEO_POSTER_INJECTION_GENERATED_FOLDER']}/{filename}",
-        #     mimetype='multipart/x-mixed-replace;'
-        #     # mimetype='video/mp4;'
-        #     )
 
-        return jsonify(
-            status="Success",
-            message=message,
-            generatedVideoUrl=f"{app.config['API_BASE_URL']}/{app.config['VIDEO_POSTER_INJECTION_GENERATED_RELATIVEPATH_FOLDER']}/{filename}"
-            ),500
+        if _uploadedVideo.isPosterInjected== True:
+
+            return jsonify(
+                status="Success",
+                message=message,
+                generatedVideoUrl=f"{app.config['API_BASE_URL']}/{app.config['VIDEO_POSTER_INJECTION_GENERATED_RELATIVEPATH_FOLDER']}/{filename}"
+                ),200
+        else:
+            return jsonify(
+                status="Success",
+                message=message,
+                generatedVideoUrl=f"{app.config['API_BASE_URL']}/{app.config['VIDEO_POSTER_INJECTION_UPLOADS_RELATIVEPATH_FOLDER']}/{filename}"
+                ),200
 
     except Exception as err:
         message = "Problem while fetching json."

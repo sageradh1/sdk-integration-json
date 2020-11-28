@@ -16,8 +16,11 @@ class Config(object):
     ADIMAGE_POSTER_INJECTION_UPLOADS_FOLDER = basedir+ "/app/static/image/posterinjection/ad-images"
     VIDEO_POSTER_INJECTION_UPLOADS_FOLDER =  basedir+"/app/static/video/posterinjection/uploaded"
     VIDEO_POSTER_INJECTION_GENERATED_FOLDER =  basedir+"/app/static/video/posterinjection/generated"
-    VIDEO_POSTER_INJECTION_GENERATED_RELATIVEPATH_FOLDER = "static/video/posterinjection/generated"
     VIDEOANALYTICS_POSTER_INJECTION_GENERATED_FOLDER =  basedir+"/app/static/analyticsFolder/posterinjection/generated"
+
+    VIDEO_POSTER_INJECTION_GENERATED_RELATIVEPATH_FOLDER = "static/video/posterinjection/generated"
+    VIDEO_POSTER_INJECTION_UPLOADS_RELATIVEPATH_FOLDER =  "static/video/posterinjection/uploaded"
+
     
     MAX_VIDEO_FILESIZE = 16 * 1024 * 1024 #max allowed video filesize is 16MB
     
