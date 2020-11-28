@@ -132,3 +132,49 @@ def get_json():
             status="Error",
             message=message
             ),500
+
+@app.route('/get-generated-video', methods=["POST"])
+def get_generated_video():
+    try:       
+        if request.method == 'POST':
+            ########################## Validation ###########################
+            if not request.form.get("API_KEY")==app.config['API_KEY']:
+                message ="Invalid api key"
+                print(message)
+                return jsonify(
+                    status="Error",
+                    message=message
+                    ),403
+
+            if not request.form.get("videoId"):
+                message ="Please provide proper videoid"
+                print(message)
+                return jsonify(
+                    status="Error",
+                    message=message
+                    ),400
+
+        _uploadedVideo = UploadedVideo.query.filter_by(videoid=request.form.get("videoId")).first()
+
+        filename = _uploadedVideo.generatedVideoFileName
+        message="Successfully fetched"
+        print(message)
+        # print(f"{app.config['VIDEO_POSTER_INJECTION_GENERATED_FOLDER']}/{filename}")
+        # return Response(f"{app.config['VIDEO_POSTER_INJECTION_GENERATED_FOLDER']}/{filename}",
+        #     mimetype='multipart/x-mixed-replace;'
+        #     # mimetype='video/mp4;'
+        #     )
+
+        return jsonify(
+            status="Success",
+            message=message,
+            generatedVideoUrl=f"{app.config['API_BASE_URL']}/{app.config['VIDEO_POSTER_INJECTION_GENERATED_RELATIVEPATH_FOLDER']}/{filename}"
+            ),500
+
+    except Exception as err:
+        message = "Problem while fetching json."
+        print(err)
+        return jsonify(
+            status="Error",
+            message=message
+            ),500
