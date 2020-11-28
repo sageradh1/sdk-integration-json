@@ -91,6 +91,7 @@ def analyse_video():
     except Exception as err:
         message = "Problem while uploading....Please try with next video..."
         print(err)
+        app.logger.error(err,exc_info=True)
         return jsonify(
             status="Error",
             message=message
@@ -127,6 +128,7 @@ def get_json():
     except Exception as err:
         message = "Problem while fetching json."
         print(err)
+        app.logger.error(err,exc_info=True)
         return jsonify(
             status="Error",
             message=message
@@ -159,6 +161,7 @@ def get_generated_video():
         message="Successfully fetched"
         print(message)
 
+
         if _uploadedVideo.isPosterInjected== True:
 
             return jsonify(
@@ -176,6 +179,7 @@ def get_generated_video():
     except Exception as err:
         message = "Problem while fetching json."
         print(err)
+        app.logger.error(err,exc_info=True)
         return jsonify(
             status="Error",
             message=message
