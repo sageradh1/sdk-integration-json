@@ -123,8 +123,6 @@ def get_json():
         filename = _uploadedVideo.analyticsFileName
         message="Successfully fetched"
         print(message)
-        print(f"{app.config['VIDEOANALYTICS_POSTER_INJECTION_GENERATED_FOLDER']}/{filename}")
-        app.logger.debug(f"{app.config['VIDEOANALYTICS_POSTER_INJECTION_GENERATED_FOLDER']}/{filename}")
         return json.load(open(f"{app.config['VIDEOANALYTICS_POSTER_INJECTION_GENERATED_FOLDER']}/{filename}"))
 
     except Exception as err:
