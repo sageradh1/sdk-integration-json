@@ -180,6 +180,7 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
                 "posterStart": posterStartTime,
                 "posterEnd": frameTime,
                 "posterURL": "asmi.co",
+                "posterImageUrl": f"{app.config['API_BASE_URL']}/{app.config['ADIMAGE_POSTER_INJECTION_RELATIVEPATH_FOLDER']}/easports.jpg",
                 "posterData": posterData,
                 }
             ]
@@ -205,6 +206,7 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
                 "posterStart": None,
                 "posterEnd": None,
                 "posterURL": None,
+                "posterImageUrl": None,
                 "posterData": None,
                 }
             ]

@@ -18,6 +18,7 @@ class Config(object):
     VIDEO_POSTER_INJECTION_GENERATED_FOLDER =  basedir+"/app/static/video/posterinjection/generated"
     VIDEOANALYTICS_POSTER_INJECTION_GENERATED_FOLDER =  basedir+"/app/static/analyticsFolder/posterinjection/generated"
 
+    ADIMAGE_POSTER_INJECTION_RELATIVEPATH_FOLDER = "static/image/posterinjection/ad-images"
     VIDEO_POSTER_INJECTION_GENERATED_RELATIVEPATH_FOLDER = "static/video/posterinjection/generated"
     VIDEO_POSTER_INJECTION_UPLOADS_RELATIVEPATH_FOLDER =  "static/video/posterinjection/uploaded"
 
