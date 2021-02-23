@@ -10,8 +10,16 @@ from app import app
 
 outputVideoPath= app.config['VIDEO_POSTER_INJECTION_GENERATED_FOLDER']
 
+import glob
+import random
+
+
+
 def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_videoPath):
-    poster = cv2.imread(f"{app.config['ADIMAGE_POSTER_INJECTION_UPLOADS_FOLDER']}/easports.jpg")
+
+    posters = glob.glob(f"{app.config['ADIMAGE_POSTER_INJECTION_UPLOADS_FOLDER']}/*.jpg")
+    random_image = random.choice(posters)
+    poster = cv2.imread(random_image)
     cap = cv2.VideoCapture(_videoPath)
 
     # fps, width and height of the current video
