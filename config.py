@@ -2,6 +2,12 @@ import secrets
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+from dotenv import load_dotenv
+
+#Loading environment from .startingenv
+APP_ROOT = os.path.join(os.path.dirname(__file__), '..')   # refers to application_top
+dotenv_path = os.path.join(APP_ROOT, '.env')
+load_dotenv(dotenv_path)
 
 class Config(object):
     DEBUG = False
@@ -11,6 +17,11 @@ class Config(object):
     VIDEO_POSTER_INJECTION_UPLOADS_FOLDER =  basedir+"/app/static/video/posterinjection/uploaded"
     VIDEO_POSTER_INJECTION_GENERATED_FOLDER =  basedir+"/app/static/video/posterinjection/generated"
     VIDEOANALYTICS_POSTER_INJECTION_GENERATED_FOLDER =  basedir+"/app/static/analyticsFolder/posterinjection/generated"
+
+    ADIMAGE_POSTER_INJECTION_RELATIVEPATH_FOLDER = "static/image/posterinjection/ad-images"
+    VIDEO_POSTER_INJECTION_GENERATED_RELATIVEPATH_FOLDER = "static/video/posterinjection/generated"
+    VIDEO_POSTER_INJECTION_UPLOADS_RELATIVEPATH_FOLDER =  "static/video/posterinjection/uploaded"
+
     
     MAX_VIDEO_FILESIZE = 16 * 1024 * 1024 #max allowed video filesize is 16MB
     
@@ -23,19 +34,19 @@ class DevelopmentConfig(Config):
     DB_NAME = os.getenv('DEV_DB_NAME')
     DB_USERNAME = os.getenv('DEV_DB_USERNAME')
     DB_PASSWORD = os.getenv('DEV_DB_PASSWORD')
-    SQLALCHEMY_DATABASE_URI = f"postgresql://{os.getenv('DEV_DB_USERNAME')}:{os.getenv('DEV_DB_PASSWORD')}@localhost/{os.getenv('DEV_DB_NAME')}"
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{os.getenv('DEV_DB_USERNAME')}:{os.getenv('DEV_DB_PASSWORD')}@{os.getenv('DEV_DB_HOST')}/{os.getenv('DEV_DB_NAME')}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-class TestConfig(Config):
+class TestingConfig(Config):
     # TODO
     DEBUG = True
 
     API_KEY=os.getenv('TEST_API_KEY')
-    # API_BASE_URL = ""
+    API_BASE_URL = "http://52.42.206.246:5001"
     DB_NAME = os.getenv('TEST_DB_NAME')
     DB_USERNAME = os.getenv('TEST_DB_USERNAME')
     DB_PASSWORD = os.getenv('TEST_DB_PASSWORD')
-    # SQLALCHEMY_DATABASE_URI = f"postgresql://{os.getenv('TEST_DB_USERNAME')}:{os.getenv('TEST_DB_PASSWORD')}@someip/{os.getenv('TEST_DB_NAME')}"
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{os.getenv('TEST_DB_USERNAME')}:{os.getenv('TEST_DB_PASSWORD')}@{os.getenv('TEST_DB_HOST')}/{os.getenv('TEST_DB_NAME')}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

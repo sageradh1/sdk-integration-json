@@ -6,4 +6,5 @@ autoenv
 *.mp4
 *.json
 migrations
-.env
+*.pem
+repeatedcode.txt

@@ -1,7 +1,6 @@
 from app import app,db
 from app.database.models import UploadedVideo
-from flask import request,jsonify,make_response,redirect, render_template
-import os
+from flask import request,jsonify,json
 import urllib.request
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -72,13 +71,16 @@ def analyse_video():
 
             ###################### Validation complete Video will be processed now ###########################
             
-            jsonFileName,withAudioOutputFileName = extractVideoPosterInjectionData(_newBaseName,_extension,_newVideoName,_videoPath)
-            print()
+            jsonFileName,withAudioOutputFileName,isPosterInjected = extractVideoPosterInjectionData(_newBaseName,_extension,_newVideoName,_videoPath)
             generatedVideoTime=datetime.utcnow()
             gen_video_dt_string = generatedVideoTime.strftime("%Y%m%d%H%M%S")
             generatedvideoname = gen_video_dt_string+"_generated_"+_newVideoName.split('.')[0]
 
-            _uploadedVideo = UploadedVideo(filename = withAudioOutputFileName,uploadStartedTime = _videoUploadTime,uploadCompletedTime=generatedVideoTime,analyticsFileName=jsonFileName,generatedVideoFileName=withAudioOutputFileName)
+            if isPosterInjected:
+                _uploadedVideo = UploadedVideo(filename = _newVideoName,uploadStartedTime = _videoUploadTime,uploadCompletedTime=generatedVideoTime,analyticsFileName=jsonFileName,generatedVideoFileName=withAudioOutputFileName,isPosterInjected=isPosterInjected)
+            else:
+                _uploadedVideo = UploadedVideo(filename = _newVideoName,uploadStartedTime = _videoUploadTime,uploadCompletedTime=generatedVideoTime,analyticsFileName=jsonFileName,generatedVideoFileName=_newVideoName,isPosterInjected=isPosterInjected)
+
             db.session.add(_uploadedVideo)
             db.session.commit()
 
@@ -93,13 +95,14 @@ def analyse_video():
     except Exception as err:
         message = "Problem while uploading....Please try with next video..."
         print(err)
+        app.logger.error(err,exc_info=True)
         return jsonify(
             status="Error",
             message=message
             ), 400
 
 @app.route('/get-json', methods=["POST"])
-def analyse_video():
+def get_json():
     try:       
         if request.method == 'POST':
             ########################## Validation ###########################
@@ -119,18 +122,77 @@ def analyse_video():
                     message=message
                     ),400
 
-  
-        print(message)
-        return jsonify(
-            status="Success",
-            message=message,
-            jsonFileUrl=f"localhost/static/{_uploadedVideo.analyticsFileName}"
-            ), 200
+        _uploadedVideo = UploadedVideo.query.filter_by(videoid=request.form.get("videoId")).first()
 
-#     except Exception as err:
-#         message = "Problem while uploading....Please try with next video..."
-#         print(err)
-#         return jsonify(
-#             status="Error",
-#             message=message
-#             ), 400
+        filename = _uploadedVideo.analyticsFileName
+        message="Successfully fetched"
+        print(message)
+        return json.load(open(f"{app.config['VIDEOANALYTICS_POSTER_INJECTION_GENERATED_FOLDER']}/{filename}"))
+
+    except Exception as err:
+        message = "Problem while fetching json."
+        print(err)
+        app.logger.error(err,exc_info=True)
+        return jsonify(
+            status="Error",
+            message=message
+            ),500
+
+@app.route('/get-generated-video', methods=["POST"])
+def get_generated_video():
+    try:       
+        if request.method == 'POST':
+            ########################## Validation ###########################
+            if not request.form.get("API_KEY")==app.config['API_KEY']:
+                message ="Invalid api key"
+                print(message)
+                return jsonify(
+                    status="Error",
+                    message=message
+                    ),403
+
+            if not request.form.get("videoId"):
+                message ="Please provide proper videoid"
+                print(message)
+                return jsonify(
+                    status="Error",
+                    message=message
+                    ),400
+
+        _uploadedVideo = UploadedVideo.query.filter_by(videoid=request.form.get("videoId")).first()
+
+        filename = _uploadedVideo.generatedVideoFileName
+        message="Successfully fetched"
+        print(message)
+
+
+        if _uploadedVideo.isPosterInjected== True:
+
+            return jsonify(
+                status="Success",
+                message=message,
+                generatedVideoUrl=f"{app.config['API_BASE_URL']}/{app.config['VIDEO_POSTER_INJECTION_GENERATED_RELATIVEPATH_FOLDER']}/{filename}"
+                ),200
+        else:
+            return jsonify(
+                status="Success",
+                message=message,
+                generatedVideoUrl=f"{app.config['API_BASE_URL']}/{app.config['VIDEO_POSTER_INJECTION_UPLOADS_RELATIVEPATH_FOLDER']}/{filename}"
+                ),200
+
+    except Exception as err:
+        message = "Problem while fetching video."
+        print(err)
+        app.logger.error(err,exc_info=True)
+        return jsonify(
+            status="Error",
+            message=message
+            ),500
+
+
+@app.route('/health-check', methods=["GET"])
+def health_check():
+    return jsonify(
+        status="Success",
+        message="The api is active."
+        ),200
