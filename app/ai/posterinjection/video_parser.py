@@ -10,10 +10,9 @@ from app import app
 
 outputVideoPath= app.config['VIDEO_POSTER_INJECTION_GENERATED_FOLDER']
 
-<<<<<<< HEAD
+
 import glob
 import random
-
 
 
 def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_videoPath):
@@ -224,7 +223,7 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
         json.dump(finalData, f, indent=3)
 
     # Generating final video with audio // Make sure you run the whole video
-    videoWithAudio = mpe.VideoFileClip(_videoFulllPath)
+    videoWithAudio = mpe.VideoFileClip(_videoPath)
     posterVideoWithoutAudio = mpe.VideoFileClip(outputVideoPath + f"/{tempNoAudioFileName}")
     audio_bg = videoWithAudio.audio
     posterVideoWithAudio = posterVideoWithoutAudio.set_audio(audio_bg)
