@@ -4,7 +4,7 @@ import os
 import json
 import moviepy.editor as mpe
 
-from .occlusion import *
+# from .occlusion import *
 from .JSONUtils import *
 from app import app
 
@@ -34,138 +34,131 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
     out = cv2.VideoWriter(outputVideoPath + f"/{tempNoAudioFileName}", cv2.VideoWriter_fourcc(*"mp4v"), fps, (fr_w, fr_h))
 
     # Getting the reference point from the function in utils
-    reference_point, left, right, top, bottom, framenum, fr_w, fr_h,isPosterInjected= get_reference_point(cap, poster, fps, out, fr_w, fr_h)
+    reference_point, left, right, top, bottom, framenum, fr_w, fr_h,prevFrame= get_reference_point(cap, poster, fps, out, fr_w, fr_h)
 
-    #Initializing the different switches and Flags
-    HSVSwitch = True
-    gijiFlag = True
-    posterFlag = 0
-    firstFrameSwitch = True
-    posterStartSwitch = True
 
-    # List for the occlusion Coordinates
+#region new ##############################
+
+	# Resizing the poster with the size of the target area
+    poster = cv2.resize(poster, (right - left, bottom - top))
+
+    # Getting the first HSV
+    hsv = cv2.cvtColor(prevFrame, cv2.COLOR_BGR2HSV)
+
+    first_hsv = hsv[reference_point]
+
+    ''' Until here we have the reference point and the four positions of the poster to be overlaid! '''
+
+	# Initializing the required variables and data structures
+    count_motion = 0
+    count_idle = 0
+    noise_flag = True
     posterData = list()
+    posterFlag = 0
+    poster_start_switch = True
+    posterStartTime = 0
+    frameTime = 0
 
-    # Looping over all the video frames
     while True:
-        # Reading the frames
         ret, frame = cap.read()
 
-        # Break condition at the end of the video
         if not ret:
-            break 
+            break
+
+        # Resetting the occluded_coords_list in every loop
+        occluded_coords_list = list()
 
         frameTime = int(cap.get(cv2.CAP_PROP_POS_MSEC))
 
-        if firstFrameSwitch:
-            firstFrameSwitch = False
-            firstFrameTime = frameTime//1000
+        motion_flag = check_camera_motion(prevFrame, frame)
+        prevFrame = frame
 
-        # Extracting the target-area from the frame to inject the poster
-        area = frame[top:bottom, left:right, :]
+        '''We increase the value of the count_motion if motion is detected!
+            And reset count_motion if motion is not detected! 
+            Similarly, for count_idle'''
 
-        # Resizing the poster as per the defined area above. Note: cv2.resize() takes in as (w,h)
-        poster = cv2.resize(poster, (right - left, bottom - top))
-        
-        # Convert the whole frame into HSV COLORSPACE
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        if motion_flag:
+            count_motion += 1
 
-        # Getting the HSV values of the reference point
-        currHSV = hsv[reference_point]
+        else:
+            count_idle += 1
+            count_motion = 0
 
-        if HSVSwitch:
-            HSVSwitch = False
-            firstHSV = currHSV
+        if count_motion > 05.00:
 
-        # Getting the lower and upper values using the function from utils
-        lower, upper = get_hsv_range(currHSV, firstHSV)
+            print("Motion Detected!!!")
+            noise_flag = True  # Noise flag is set to True, which enables the checking bg after motion is stabilized
 
-        # Create kernel for image dilation
-        kernel = np.ones((1,1), np.uint8)
+            count_idle = 0
 
-        # Creating the mask using for the HSV frame using the upper and lower values
-        mask = cv2.inRange(hsv, lower, upper)
-
-        # Perform dilation on the mask to reduce noise
-        dil = cv2.dilate(mask, kernel, iterations=5)
-        
-        # To check whether there is gijigiji or not
-        if gijiFlag:
-            # We check giji giji at t sec, t + 10 sec and t + 20 sec
-            if frameTime//1000 in [firstFrameTime, firstFrameTime + 10, firstFrameTime + 20]:
-                gijiFlag = checkGijiGiji(dil, fr_w, fr_h)
+            # After the motion is detected, we reset the first_hsv point until the video is stabilized
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            first_hsv = hsv[reference_point]
 
             out.write(frame)
-            frame = cv2.resize(frame, None, fx=0.5, fy = 0.5)
-            # cv2.imshow('frame', frame)
-            print(f"Frame {framenum}: Done!")
-            framenum += 1
-
-            key = cv2.waitKey(1)
-            if key == ord('q'):
-                break
+            # cv2.imshow("frame", frame)
+            # if cv2.waitKey(1) in [ord('q') or ord('Q')]:
+            # 	break
 
             continue
 
-        # At this point, we are sure that the poster gets injected into the video
-        if posterStartSwitch:
-            posterFlag = 1
-            posterStartTime = frameTime
-            posterStartSwitch = False
+        '''Now we check whether the video is idle for 2 seconds! If the video is idle for more than 2 seconds,
+            then we again try to project the poster!!!'''
+        if count_idle > fps * 2:
 
-        # Now extract the area from the HSV frame with individual 3 channels
-        mini_dil = np.zeros_like(area)
-        mini_dil[:, :, 0] = dil[top: bottom, left: right]
-        mini_dil[:, :, 1] = dil[top: bottom, left: right]
-        mini_dil[:, :, 2] = dil[top: bottom, left: right]
+            # Cropping the targeted area from the raw video frame
+            # This is the area where we inject the poster
+            cropped_frame = frame[top: bottom, left: right, :]
 
-        # Checking the occlusion and getting the occluded coordinates at every 10 frame
-        if framenum % 10 == 0:
-            occlusionCoordinatesList = findOcclusionCoordinates(frame, mini_dil, fr_h, fr_w)
+            # Creating the fine mask of the video frame segregating the foreground and background
+            mask = generate_fine_mask(frame, reference_point, first_hsv)
 
-            if occlusionCoordinatesList:
-                occlusionDict = dict()
-                occlusionDict["timeInMilliSec"] = frameTime
-                occlusionDict["occlusionCoords"] = occlusionCoordinatesList
-                posterData.append(occlusionDict)
+            # if noise_flag:
+            # 	# Checking the noisy background
+            # 	noise_flag = check_noisy_bg(mask, fr_w, fr_h)
 
-        # Create the copy of the poster
-        poster_copy = poster.copy()
+            # 	out.write(frame)
+            # 	cv2.imshow("frame", frame)
+            # 	if cv2.waitKey(1) in [ord('q'), ord('Q')]:
+            # 		break
 
-        # Set pixel values of the poster_coy to 1 where pixel value of the mask is 0
-        poster_copy[mini_dil == 0] = 1
+            # 	continue
 
-        # Now set the pixel values in the target area to 1 where the pixel values of the poster_copy is not 1
-        area[mini_dil != 0] = 1
+            # Extracting the region of interest from the mask
+            cropped_mask = mask[top: bottom, left: right]
+            # cv2.imshow("crop", cropped_mask)
 
-        # Merge the poster_copy and the target area
-        area = area * poster_copy
+            if poster_start_switch:
+                posterFlag = 1
+                posterStartTime = frameTime
+                poster_start_switch = False
 
-        # Now insert the final poster into the main frame
-        frame[top: bottom, left:right, :] = area
+            occluded_coords_list = find_occluded_coords(cropped_mask, left, top)
+
+            if occluded_coords_list:
+                occlusion_dict = dict()
+                occlusion_dict["timeInMilliSec"] = frameTime
+                occlusion_dict["occlusionCoords"] = occluded_coords_list
+                posterData.append(occlusion_dict)
+
+            # Injecting the poster onto the target area since there is no noise and video is stable
+            frame = process_frame(poster, frame, cropped_frame, cropped_mask, left, right, top, bottom)
+
         out.write(frame)
-        frame = cv2.resize(frame, None, fx=0.5, fy = 0.5)
-        
-        # Showing the final frame 
-        # cv2.imshow('frame', frame)
-        print(f"Frame {framenum}: Done!")
-        framenum += 1
+        # cv2.imshow("frame", frame)
+        # if cv2.waitKey(1) in [ord('q'), ord('Q')]:
+            # break
 
-        # Waiting for the key to be pressed by the user. If key is 'q' then quit everything
-        key = cv2.waitKey(1)
-        if key == ord('q'):
-            break
-
-    cv2.destroyAllWindows()
     cap.release()
     out.release()
+#endregion##################
 
     # if not os.path.exists("Output JSON"):
     #     os.mkdir("Output JSON")
 
     # Generating the final data for JSON
     if posterFlag:
-        isPosterInjected=True
+        # isPosterInjected=True
         finalData = {
 
             "dataForVideo":
@@ -193,7 +186,7 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
             ]
         }
     else:
-        isPosterInjected=False
+        # isPosterInjected=False
         finalData = {
             "dataForVideo":
                 {
@@ -232,4 +225,4 @@ def extractVideoPosterInjectionData(__newBaseName,_extension,_newVideoName,_vide
     if os.path.isfile(outputVideoPath + f"/{tempNoAudioFileName}"):
         os.remove(outputVideoPath + f"/{tempNoAudioFileName}")
     
-    return jsonFileName,withAudioOutputFileName,isPosterInjected
+    return jsonFileName,withAudioOutputFileName,posterFlag
